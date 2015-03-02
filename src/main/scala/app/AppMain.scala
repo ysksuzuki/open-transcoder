@@ -9,6 +9,13 @@ import scala.io.Source
 
 object AppMain {
 
+
+  def configLoad = {
+    val config = ConfigFactory.load(config)
+    ConfigFactory.load
+    ConfigFactory.load("open-transcoder")
+  }
+
   def main(args: Array[String]) {
     parseArgs(args.mkString(" ")) map { commandArgs =>
       val logger = Logger(LoggerFactory.getLogger(commandArgs.logLevel.logger))

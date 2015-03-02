@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--suppress ALL -->
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <encoder>
+            <pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level %msg%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="InfoLogger">
+        <level value="INFO" />
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="DebugLogger">OFF
+        <level value="DEBUG" />
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="ErrorLogger">
+        <level value="ERROR" />
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="WarnLogger">
+        <level value="ERROR" />
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="QuietLogger">
+        <level value="OFF" />
+    </logger>
+    <root>
+        <level value="OFF" />
+    </root>
+</configuration>

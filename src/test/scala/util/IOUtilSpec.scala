@@ -1,16 +1,26 @@
 package util
 
-import org.scalatest.FlatSpec
-
+import test.UnitSpec
 import scala.io.Source
 import scala.util.Properties
+import scalax.file.Path
+import scalax.file.PathMatcher.All
 
-class IOUtiSpec extends FlatSpec {
+class IOUtiSpec extends UnitSpec {
 
   val url = "http://ciscobinary.openh264.org/openh264-linux64-v1.3.zip"
+  val resources = "src/test/resources/util"
+
+  before {
+    Path.fromString(resources) * All foreach(_ delete())
+  }
+
+  after {
+    Path.fromString(resources) * All foreach(_ delete())
+  }
 
   "The download function" should "downloads a file which is indicated" in {
-    assert(IOUtil.download(url, "src/test/resources/util").get == "openh264-linux64-v1.3.zip")
+    assert(IOUtil.download(url, resources).get == "openh264-linux64-v1.3.zip")
   }
 
   "The writeText function" should "writes a text to a file which is indicated" in {
@@ -25,7 +35,7 @@ class IOUtiSpec extends FlatSpec {
         |
         |This is a append text.
       """.stripMargin
-    val file = "src/test/resources/util/writeText.txt"
+    val file = resources + "/writeText.txt"
     IOUtil.writeText(file, text)
     var source = Source.fromFile(file)
     assert(text == source.getLines().mkString(Properties.lineSeparator))

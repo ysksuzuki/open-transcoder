@@ -30,11 +30,11 @@ object InstallManager {
   def install(config: Config) = {
     val installer = {
       if (PlatformUtil.isLinux) {
-        new LinuxInstaller(config.getString(""), config.getString(""))
+        new LinuxInstaller(config.getString("openh264.linux.url"), config.getString("openh264.dest"))
       } else if (PlatformUtil.isWindows) {
-        new LinuxInstaller(config.getString(""), config.getString(""))
+        new WindowsInstaller(config.getString("openh264.windows.url"), config.getString("openh264.dest"))
       } else {
-        new LinuxInstaller(config.getString(""), config.getString(""))
+        new LinuxInstaller(config.getString("openh264.linux.url"), config.getString("openh264.dest"))
       }
     }
     installer.install()
