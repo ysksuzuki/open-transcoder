@@ -1,6 +1,8 @@
 package app
 
-import com.typesafe.config.{ConfigFactory, Config}
+import java.io.File
+
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import model._
 import org.slf4j.LoggerFactory
@@ -9,20 +11,13 @@ import scala.io.Source
 
 object AppMain {
 
-
-  def configLoad = {
-    val config = ConfigFactory.load(config)
-    ConfigFactory.load
-    ConfigFactory.load("open-transcoder")
-  }
-
   def main(args: Array[String]) {
     parseArgs(args.mkString(" ")) map { commandArgs =>
       val logger = Logger(LoggerFactory.getLogger(commandArgs.logLevel.logger))
       logger.info(s"main start. args=${args.mkString(" ")}")
       val status =
         trye {
-          val config = ConfigFactory.load()
+          val config = loadConfig()
           Transcoder.transcode(config, commandArgs)
           Success
         } match {
@@ -36,6 +31,11 @@ object AppMain {
     } getOrElse { System.exit(Failure.code) }
   }
 
+  private def loadConfig() = {
+    val file = "open-transcoder.conf"
+    if (new File(file).exists()) ConfigFactory.load(file)
+    else ConfigFactory.load()
+  }
   private def parseArgs(args: String): Option[CommandLineArgs] = {
     val opts: Map[String, (String, String)] = parse(args)
     if (opts.contains("h") || opts.contains("-help")) {
@@ -47,28 +47,18 @@ object AppMain {
     } else {
       trye {
         val in = checkArg {
-          opts.get("i").getOrElse {
-            opts.get("-input").getOrElse {
-              throw new Exception("error: -i or --input is required")
-            }
-          }._1
+          opts.getOrElse("i", opts.getOrElse("-input", throw new Exception("error: -i or --input is required")))._1
         } { in: String =>
           if (!in.isEmpty) in
           else throw new Exception("error: input file is not specified")
         }
         val (out1, out2) = checkArg {
-          opts.get("o").getOrElse {
-            opts.get("-output").getOrElse {
-              throw new Exception("error: -o or --output is required")
-            }
-          }
+          opts.getOrElse("o", opts.getOrElse("-output", throw new Exception("error: -o or --output is required")))
         } { out =>
           if (!out._1.isEmpty) out
           else throw new Exception("error: output file is not specified")
         }
-        val logLevel = opts.get("l").getOrElse {
-          opts.get("-logLevel").getOrElse(("quiet", ""))
-        }._1
+        val logLevel = opts.getOrElse("l", opts.getOrElse("-logLevel", ("quiet", "")))._1
         Some(
           CommandLineArgs(in, out1, out2, LogLevel(logLevel))
         )
@@ -98,7 +88,7 @@ object AppMain {
   private def checkArg[T](f: => T)(validate: T => T) = {
     trye {
       f
-    }.right.map(validate(_)) match {
+    }.right.map(validate) match {
       case Right(a) => a
       case Left(e) => throw e
     }
@@ -129,11 +119,20 @@ object AppMain {
         |-l  | --logLevel <quiet|error|info|warning>
         |-h  | --help
         |-li | --license
+        |
+        |[Example]
+        |# mp4
+        | java -jar open-transcoder.jar -i input.mp4 -o output.mp4 -l quiet
+        |# hls
+        | java -jar open-transcoder.jar -i input.mp4 -o playlist.m3u8 -l quiet
+        |# webm
+        | java -jar open-transcoder.jar -i input.mp4 -o output.webm -l quiet
+        |
       """.stripMargin)
   }
 
   private def printLicense() = {
-    Source.fromURL("http://www.openh264.org/BINARY_LICENSE.txt").getLines().foreach(println _)
+    Source.fromURL("http://www.openh264.org/BINARY_LICENSE.txt").getLines().foreach(println)
   }
 
 }
