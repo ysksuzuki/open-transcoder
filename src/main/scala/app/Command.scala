@@ -9,7 +9,7 @@ trait CommandBase {
   val command: String
   val logLevel: LogLevel
   val logger = LoggerFactory.getLogger(logLevel.logger)
-  def execute(params: Seq[String], file: Option[File] = None): String = {
+  def execute(params: Seq[String] = Seq(), file: Option[File] = None): String = {
     logger.info(s"command: ${command.format(params: _*)}")
     val result = executeCommand(params, file)
     logger.info("command end.")

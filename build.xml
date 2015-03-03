@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="open-transcoder" default="all" basedir=".">
+
+  <property name="target.dir" value="target"/>
+  <property name="dist.dir" value="target/dist"/>
+  <property name="scala.version" value="2.11"/>
+
+  <condition property="sbt.exec" value="sbt.bat" else="sbt">
+    <os family="windows" />
+  </condition>
+
+  <target name="clean">
+    <delete dir="${dist.dir}"/>
+  </target>
+
+  <target name="jar" depends="clean">
+    <exec executable="${sbt.exec}" resolveexecutable="true" failonerror="true">
+      <arg line="clean assembly" />
+    </exec>
+  </target>
+
+  <target name="package" depends="jar">
+    <mkdir dir="${dist.dir}"/>
+    <move file="${target.dir}/scala-${scala.version}/open-transcoder.jar"
+            tofile="${dist.dir}/open-transcoder.jar"/>
+    <copydir src="lib" dest="${dist.dir}/lib" />
+  </target>
+  <target name="all" depends="package" />
+</project>

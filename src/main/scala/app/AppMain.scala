@@ -73,6 +73,7 @@ object AppMain {
     try {
       val config = loadConfig()
       InstallManager.install(config)
+      val dollar = "$"
       println(
         s"""
            |install succeeded.
@@ -81,6 +82,12 @@ object AppMain {
            |OpenH264 Video Codec provided by Cisco Systems, Inc.
            |License:
            |http://www.openh264.org/BINARY_LICENSE.txt"
+           |
+           |Please add your shared library path.
+           |Linux:
+           | export LD_LIBRARY_PATH=${config.getString("openh264.dest")}:${dollar}LD_LIBRARY_PATH
+           |Windows:
+           |
            |
          """.stripMargin)
       Success

@@ -2,7 +2,9 @@ package installer
 
 import java.io.File
 import java.net.URL
+import app.Command
 import com.typesafe.config.Config
+import model.{Quiet, BasicCommand}
 import sbt.IO
 import util.PlatformUtil
 
@@ -27,7 +29,8 @@ class LinuxInstaller(
         override val url: String, override val dest: String, override val libName: String) extends Installer {
   override def configure() = {
     new File(dest + "/" + libName).renameTo(new File(dest + "/libopenh264.so.0"))
-
+    Command(BasicCommand, s"chmod 751 ${dest}/ffmpeg", Quiet).execute()
+    Command(BasicCommand, s"chmod 751 ${dest}/ffprobe", Quiet).execute()
   }
 }
 
