@@ -21,11 +21,11 @@ class IOUtiSpec extends UnitSpec {
     Path.fromString(resources) * All foreach(_ deleteRecursively())
   }
 
-  "The download function" should "downloads a file which is indicated" in {
+  "The download function" should "download a file which is indicated" in {
     assert(IOUtil.download(url, resources).get == "openh264-linux64-v1.3.zip")
   }
 
-  "The writeText function" should "writes a text to a file which is indicated" in {
+  "The writeText function" should "write a text to a file which is indicated" in {
     val text =
       """
         |This is a sample text.
@@ -48,15 +48,15 @@ class IOUtiSpec extends UnitSpec {
 
   }
 
-  "The extension function" should "extracts an extension from a file name" in {
+  "The extension function" should "extract an extension from a file name" in {
     assert("zip" == IOUtil.extension(url).get)
   }
 
-  "The filename function" should "extracts a file name from an uri" in {
+  "The filename function" should "extract a file name from an uri" in {
     assert("openh264-linux64-v1.3.zip" == IOUtil.filename(url).get)
   }
 
-  "The fileSearch function" should "searches files from a directory recursively" in {
+  "The fileSearch function" should "searche files from a directory recursively" in {
     val expected = List(
       new File("src/test/resources/util/hoge/fuga.txt"),
       new File("src/test/resources/util/hoge.txt"),
@@ -67,7 +67,7 @@ class IOUtiSpec extends UnitSpec {
     assert(result == expected)
   }
 
-  "The fileSearch function" should "searches and filters files from a directory recursively" in {
+  "The fileSearch function" should "searche and filters files from a directory recursively" in {
     val expected = List(
       new File("src/test/resources/util/hoge/fuga.txt"),
       new File("src/test/resources/util/hoge/fuga/fuga.txt")
