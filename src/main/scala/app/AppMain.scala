@@ -13,12 +13,14 @@ import scala.io.Source
 object AppMain {
 
   def main(args: Array[String]): Unit = {
-    val subCommand = args.headOption.getOrElse("")
+    val subCommand = args.headOption.map { sub =>
+        if (sub.startsWith("-")) "" else sub
+      } getOrElse("")
     val status: ExitStatus = {
       SubCommand(subCommand) map {
         case Transcode => {
           val transArgs = {
-            if (subCommand.startsWith("-") || args.isEmpty) args
+            if (subCommand.isEmpty) args
             else args.tail
           }
           transcode(transArgs)
