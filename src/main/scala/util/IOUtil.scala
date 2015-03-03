@@ -2,6 +2,7 @@ package util
 
 import java.io.File
 
+import scala.annotation.tailrec
 import scalax.io.Resource
 import sbt._
 
@@ -33,6 +34,18 @@ object IOUtil {
       }
       case _ => None
     }
+  }
+
+  def fileSearch(file: File)(implicit f: File => Boolean = f => true) = {
+    @tailrec
+    def fileSearchInner(files: List[File], result: List[File]): List[File] = {
+      if (files.forall(_.isFile)) {
+        result ::: files.filter(f)
+      } else {
+        fileSearchInner(files.filter(_.isDirectory).flatMap(_.listFiles()), files.filter(_.isFile).filter(f) ::: result)
+      }
+    }
+    fileSearchInner(List(file), Nil)
   }
 }
 

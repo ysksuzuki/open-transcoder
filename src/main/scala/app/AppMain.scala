@@ -4,6 +4,7 @@ import java.io.File
 
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
+import installer.{ConfigManager, InstallManager}
 import model._
 import org.slf4j.LoggerFactory
 
@@ -11,31 +12,92 @@ import scala.io.Source
 
 object AppMain {
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
+    val subCommand = args.headOption.getOrElse("")
+    val status: ExitStatus = {
+      SubCommand(subCommand) map {
+        case Transcode => {
+          val transArgs = {
+            if (subCommand.startsWith("-") || args.isEmpty) args
+            else args.tail
+          }
+          transcode(transArgs)
+        }
+        case Config => configure()
+        case Install => install()
+      } getOrElse(Failure)
+    }
+    System.exit(status.code)
+  }
+
+  private def transcode(args: Array[String]) = {
     parseArgs(args.mkString(" ")) map { commandArgs =>
       val logger = Logger(LoggerFactory.getLogger(commandArgs.logLevel.logger))
-      logger.info(s"main start. args=${args.mkString(" ")}")
-      val status =
-        trye {
-          val config = loadConfig()
-          Transcoder.transcode(config, commandArgs)
-          Success
-        } match {
-          case Right(status) => status
-          case Left(ex)  => {
-            println(ex.getMessage)
-            Failure
-          }
+      logger.info(s"transcode start. args=${args.mkString(" ")}")
+      try {
+        val config = loadConfig()
+        Transcoder.transcode(config, commandArgs)
+        Success
+      } catch {
+        case ex: Throwable => {
+          println(ex.getMessage)
+          Failure
         }
-      System.exit(status.code)
-    } getOrElse { System.exit(Failure.code) }
+      }
+    } getOrElse { Failure }
+  }
+
+  private def configure() = {
+    try {
+      ConfigManager.configure()
+      println(
+        s"""configure succeeded.
+           |open-transcoder.conf was created here.
+           |If you want change settings, please modify it.
+           |After that, run install.
+           |
+           |[command]
+           |java -jar open-transcoder.jar install
+         """.stripMargin)
+      Success
+    } catch {
+      case ex: Throwable => {
+        println(s"configure failed!!")
+        println(ex.getMessage)
+        Failure
+      }
+    }
+  }
+
+  private def install() = {
+    try {
+      val config = loadConfig()
+      InstallManager.install(config)
+      println(
+        s"""
+           |install succeeded.
+           |OpenH264 library was installed in ${config.getString("openh264.dest")}.
+           |
+           |OpenH264 Video Codec provided by Cisco Systems, Inc.
+           |License:
+           |http://www.openh264.org/BINARY_LICENSE.txt"
+           |
+         """.stripMargin)
+      Success
+    } catch {
+      case ex: Throwable => {
+        println(ex.getMessage)
+        Failure
+      }
+    }
   }
 
   private def loadConfig() = {
-    val file = "open-transcoder.conf"
-    if (new File(file).exists()) ConfigFactory.load(file)
+    val file = new File("open-transcoder.conf")
+    if (file.exists()) ConfigFactory.parseFile(file)
     else ConfigFactory.load()
   }
+
   private def parseArgs(args: String): Option[CommandLineArgs] = {
     val opts: Map[String, (String, String)] = parse(args)
     if (opts.contains("h") || opts.contains("-help")) {
@@ -45,7 +107,7 @@ object AppMain {
       printLicense()
       None
     } else {
-      trye {
+      try {
         val in = checkArg {
           opts.getOrElse("i", opts.getOrElse("-input", throw new Exception("error: -i or --input is required")))._1
         } { in: String =>
@@ -58,14 +120,13 @@ object AppMain {
           if (!out._1.isEmpty) out
           else throw new Exception("error: output file is not specified")
         }
-        val logLevel = opts.getOrElse("l", opts.getOrElse("-logLevel", ("quiet", "")))._1
+        val logLevel = opts.getOrElse("l", opts.getOrElse("-logLevel", (Info.level, "")))._1
         Some(
-          CommandLineArgs(in, out1, out2, LogLevel(logLevel))
+          CommandLineArgs(in, out1, out2, LogLevel(logLevel).getOrElse(Info))
         )
-      } match {
-        case Right(a) => a
-        case Left(e) => {
-          println(e.getMessage)
+      } catch {
+        case ex: Throwable => {
+          println(ex.getMessage)
           printHelp()
           None
         }
@@ -110,7 +171,12 @@ object AppMain {
         |
         |OpenH264 Video Codec provided by Cisco Systems, Inc.
         |
-        |[Usage]
+        |[Sub Command]
+        | transcode (default)
+        | config
+        | install
+        |
+        |[Usage - transcode]
         |java -jar open-transcoder.jar [options]
         |
         |[options]
@@ -127,6 +193,12 @@ object AppMain {
         | java -jar open-transcoder.jar -i input.mp4 -o playlist.m3u8 -l quiet
         |# webm
         | java -jar open-transcoder.jar -i input.mp4 -o output.webm -l quiet
+        |
+        |[Usage - config]
+        |java -jar open-transcoder.jar config
+        |
+        |[Usage - install]
+        |java -jar open-transcoder.jar install
         |
       """.stripMargin)
   }

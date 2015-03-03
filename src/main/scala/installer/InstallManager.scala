@@ -9,6 +9,7 @@ import util.PlatformUtil
 trait Installer {
   val url: String
   val dest: String
+  val libName: String
   def install() = {
     download()
     configure()
@@ -17,12 +18,17 @@ trait Installer {
   def configure()
 }
 
-class WindowsInstaller(override val url: String, override val dest: String) extends Installer {
+class WindowsInstaller(
+        override val url: String, override val dest: String, override val libName: String) extends Installer {
   override def configure() = {}
 }
 
-class LinuxInstaller(override val url: String, override val dest: String) extends Installer {
-  override def configure() = {}
+class LinuxInstaller(
+        override val url: String, override val dest: String, override val libName: String) extends Installer {
+  override def configure() = {
+    new File(dest + "/" + libName).renameTo(new File(dest + "/libopenh264.so.0"))
+
+  }
 }
 
 object InstallManager {
@@ -30,11 +36,14 @@ object InstallManager {
   def install(config: Config) = {
     val installer = {
       if (PlatformUtil.isLinux) {
-        new LinuxInstaller(config.getString("openh264.linux.url"), config.getString("openh264.dest"))
+        new LinuxInstaller(
+          config.getString("openh264.linux.url"), config.getString("openh264.dest"), config.getString("openh264.linux.libName"))
       } else if (PlatformUtil.isWindows) {
-        new WindowsInstaller(config.getString("openh264.windows.url"), config.getString("openh264.dest"))
+        new WindowsInstaller(
+          config.getString("openh264.windows.url"), config.getString("openh264.dest"), config.getString("openh264.windows.libName"))
       } else {
-        new LinuxInstaller(config.getString("openh264.linux.url"), config.getString("openh264.dest"))
+        new LinuxInstaller(
+          config.getString("openh264.linux.url"), config.getString("openh264.dest"), config.getString("openh264.linux.libName"))
       }
     }
     installer.install()

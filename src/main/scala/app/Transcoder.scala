@@ -54,7 +54,7 @@ object Transcoder {
         if (mediaInfo.videoInfo.codec_name == "h264") "copy" else "libopenh264",
         if (mediaInfo.audioInfo.codec_name == "aac") "copy" else "libvo_aacenc",
         args.out1,
-        if (!args.out2.isEmpty) args.out2 else config.getString("filename.segment"),
+        if (!args.out2.isEmpty) args.out2 else config.getString("fileName.segment"),
         args.logLevel.level
       )
     )
