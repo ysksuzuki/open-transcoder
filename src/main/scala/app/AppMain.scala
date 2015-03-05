@@ -87,9 +87,10 @@ object AppMain {
            |
            |Please add your shared library path.
            |Linux:
+           |Add this to your .bash_profile and run source command
            | export LD_LIBRARY_PATH=${config.getString("openh264.dest")}:${dollar}LD_LIBRARY_PATH
            |Windows:
-           |
+           | Nothing to do
            |
          """.stripMargin)
       Success
@@ -146,7 +147,7 @@ object AppMain {
   private def parse(args: String): Map[String, (String, String)] = {
     val OptPattern = """-(\S+)\s*([^-]\S+)?\s*([^-]\S+)?""".r
     OptPattern.findAllIn(args).matchData.map { m =>
-      m.group(1) -> (strCheck(m.group(2)), strCheck(m.group(3)))
+      (m.group(1), (strCheck(m.group(2)), strCheck(m.group(3))))
     }.toMap
   }
 

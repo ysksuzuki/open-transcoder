@@ -14,8 +14,9 @@ class InstallManagerSpec extends UnitSpec {
 
   before {
     Path.fromString(resources) * All foreach(_ deleteRecursively())
-    Path.fromString("lib/ffmpeg").copyTo(Path.fromString(resources + "/ffmpeg"))
-    Path.fromString("lib/ffprobe").copyTo(Path.fromString(resources + "/ffprobe"))
+    Path.fromString("bin/ffmpeg").copyTo(Path.fromString(resources + "/ffmpeg"))
+    Path.fromString("bin/ffprobe").copyTo(Path.fromString(resources + "/ffprobe"))
+    Path.fromString("bin/run.sh").copyTo(Path.fromString(resources + "/run.sh"))
   }
 
   after {

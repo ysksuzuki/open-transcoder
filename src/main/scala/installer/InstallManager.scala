@@ -22,15 +22,18 @@ trait Installer {
 
 class WindowsInstaller(
         override val url: String, override val dest: String, override val libName: String) extends Installer {
-  override def configure() = {}
+  override def configure() = {
+    new File(dest + "/" + libName).renameTo(new File(dest + "/libopenh264.dll"))
+  }
 }
 
 class LinuxInstaller(
         override val url: String, override val dest: String, override val libName: String) extends Installer {
   override def configure() = {
     new File(dest + "/" + libName).renameTo(new File(dest + "/libopenh264.so.0"))
-    Command(BasicCommand, s"chmod 751 ${dest}/ffmpeg", Quiet).execute()
-    Command(BasicCommand, s"chmod 751 ${dest}/ffprobe", Quiet).execute()
+    Command(BasicCommand, s"chmod 775 ${dest}/ffmpeg", Quiet).execute()
+    Command(BasicCommand, s"chmod 775 ${dest}/ffprobe", Quiet).execute()
+    Command(BasicCommand, s"chmod 775 ${dest}/run.sh", Quiet).execute()
   }
 }
 

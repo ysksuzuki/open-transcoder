@@ -23,7 +23,7 @@
     <mkdir dir="${dist.dir}"/>
     <move file="${target.dir}/scala-${scala.version}/open-transcoder.jar"
             tofile="${dist.dir}/open-transcoder.jar"/>
-    <copydir src="lib" dest="${dist.dir}/lib" />
+    <copydir src="bin" dest="${dist.dir}/bin" />
   </target>
   <target name="all" depends="package" />
 </project>
