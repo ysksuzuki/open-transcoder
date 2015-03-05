@@ -20,8 +20,18 @@ class ConfigManagerSpec extends UnitSpec {
     Path.fromString(resources) * All foreach(_ deleteRecursively())
   }
 
+  override def beforeAll(): Unit = {
+    val path = Path.fromString(resources)
+    if (path.nonExistent) {
+      path.doCreateDirectory()
+    }
+  }
+
+  override def afterAll(): Unit = {
+  }
+
   "The configure function" should "create a configuration file" in {
-    ConfigManager.configure(resources + conf)
+    ConfigManager().configure(resources + conf)
     assert(new File(resources + conf).exists())
   }
 }

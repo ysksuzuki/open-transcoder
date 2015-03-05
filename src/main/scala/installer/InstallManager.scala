@@ -39,19 +39,16 @@ class LinuxInstaller(
 
 object InstallManager {
 
-  def install(config: Config) = {
-    val installer = {
-      if (PlatformUtil.isLinux) {
-        new LinuxInstaller(
-          config.getString("openh264.linux.url"), config.getString("openh264.dest"), config.getString("openh264.linux.libName"))
-      } else if (PlatformUtil.isWindows) {
-        new WindowsInstaller(
-          config.getString("openh264.windows.url"), config.getString("openh264.dest"), config.getString("openh264.windows.libName"))
-      } else {
-        new LinuxInstaller(
-          config.getString("openh264.linux.url"), config.getString("openh264.dest"), config.getString("openh264.linux.libName"))
-      }
+  def apply(config: Config) = {
+    if (PlatformUtil.isLinux) {
+      new LinuxInstaller(
+        config.getString("openh264.linux.url"), config.getString("openh264.dest"), config.getString("openh264.linux.libName"))
+    } else if (PlatformUtil.isWindows) {
+      new WindowsInstaller(
+        config.getString("openh264.windows.url"), config.getString("openh264.dest"), config.getString("openh264.windows.libName"))
+    } else {
+      new LinuxInstaller(
+        config.getString("openh264.linux.url"), config.getString("openh264.dest"), config.getString("openh264.linux.libName"))
     }
-    installer.install()
   }
 }

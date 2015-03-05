@@ -3,17 +3,15 @@ package installer
 import java.io.File
 
 import model.StringProperty
-import util.IOUtil
+import util.{PlatformUtil, IOUtil}
 
 import scala.io.Source
 import scala.util.Properties
-import scala.util.matching.Regex
 
-object ConfigManager {
-
+trait Configure {
+  val ffmpeg: String
+  val ffprobe: String
   def configure(file: String = "open-transcoder.conf") = {
-    val ffmpeg =  getAbsolutePath("""(ffmpeg)*""".r)
-    val ffprobe = getAbsolutePath("""(ffprobe)*""".r)
     val header =
       """include classpath("application.conf")
         |
@@ -39,15 +37,29 @@ object ConfigManager {
     } mkString Properties.lineSeparator
     IOUtil.writeText(file, header + contents)
   }
-
-  private def getAbsolutePath(pattern: Regex): String = {
+  protected def getAbsolutePath(pattern: String): String = {
     val current = new File(".").getAbsoluteFile.getParent
-    IOUtil.fileSearch(new File(current)) { file =>
-      file.getName match {
-        case pattern(n) => true
-        case _ => false
-      }
+    IOUtil.fileSearch(new File(current)) {
+      _.getName.matches(pattern)
     }.headOption.map(_.getAbsolutePath).getOrElse("")
+  }
+}
+
+class WindowsConfigure extends Configure {
+  override val ffmpeg =  getAbsolutePath("""ffmpeg*.exe""")
+  override val ffprobe = getAbsolutePath("""ffprobe*.exe""")
+}
+
+class LinuxConfigure extends Configure {
+  override val ffmpeg =  getAbsolutePath("""ffmpeg*""")
+  override val ffprobe = getAbsolutePath("""ffprobe*""")
+}
+
+object ConfigManager {
+  def apply() = {
+    if (PlatformUtil.isLinux) new LinuxConfigure()
+    else if (PlatformUtil.isWindows) new WindowsConfigure()
+    else new LinuxConfigure()
   }
 }
 

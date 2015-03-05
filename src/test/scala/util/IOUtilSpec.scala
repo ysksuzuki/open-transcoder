@@ -21,6 +21,16 @@ class IOUtiSpec extends UnitSpec {
     Path.fromString(resources) * All foreach(_ deleteRecursively())
   }
 
+  override def beforeAll(): Unit = {
+    val path = Path.fromString(resources)
+    if (path.nonExistent) {
+      path.doCreateDirectory()
+    }
+  }
+
+  override def afterAll(): Unit = {
+  }
+
   "The download function" should "download a file which is indicated" in {
     assert(IOUtil.download(url, resources).get == "openh264-linux64-v1.3.zip")
   }

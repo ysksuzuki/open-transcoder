@@ -27,7 +27,10 @@ object AppMain {
         }
         case Config => configure()
         case Install => install()
-      } getOrElse(Failure)
+      } getOrElse {
+        printHelp()
+        Failure
+      }
     }
     System.exit(status.code)
   }
@@ -51,7 +54,7 @@ object AppMain {
 
   private def configure() = {
     try {
-      ConfigManager.configure()
+      ConfigManager().configure()
       println(
         s"""configure succeeded.
            |open-transcoder.conf was created here.
@@ -74,7 +77,7 @@ object AppMain {
   private def install() = {
     try {
       val config = loadConfig()
-      InstallManager.install(config)
+      InstallManager(config).install()
       val dollar = "$"
       println(
         s"""
@@ -104,8 +107,8 @@ object AppMain {
 
   private def loadConfig() = {
     val file = new File("open-transcoder.conf")
-    if (file.exists()) ConfigFactory.parseFile(file)
-    else ConfigFactory.load()
+    if (file.exists()) ConfigFactory.parseFile(file).resolve()
+    else ConfigFactory.load().resolve()
   }
 
   private def parseArgs(args: String): Option[CommandLineArgs] = {

@@ -23,9 +23,19 @@ class InstallManagerSpec extends UnitSpec {
     Path.fromString(resources) * All foreach(_ deleteRecursively())
   }
 
+  override def beforeAll(): Unit = {
+    val path = Path.fromString(resources)
+    if (path.nonExistent) {
+      path.doCreateDirectory()
+    }
+  }
+
+  override def afterAll(): Unit = {
+  }
+
   "The install function" should "install a OpenH264 library" in {
     val config = ConfigFactory.load()
-    InstallManager.install(config)
+    InstallManager(config).install()
     assert(new File(resources + "/" + libName).exists())
     assert(new File(resources + "/" + infoName).exists())
   }

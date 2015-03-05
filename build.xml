@@ -2,7 +2,7 @@
 <project name="open-transcoder" default="all" basedir=".">
 
   <property name="target.dir" value="target"/>
-  <property name="dist.dir" value="target/dist"/>
+  <property name="dist.dir" value="target/open-transcoder"/>
   <property name="scala.version" value="2.11"/>
 
   <condition property="sbt.exec" value="sbt.bat" else="sbt">

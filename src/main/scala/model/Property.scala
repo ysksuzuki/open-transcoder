@@ -6,5 +6,12 @@ case class StringProperty (
   indent: String = "    ",
   separator: String = " = "
 ) {
-  override def toString() = s"""${indent}${key}${separator}"${value}""""
+  override def toString() = {
+    val quote = {
+      if (escapePattern(value)) "\"\"\""
+      else "\""
+    }
+    s"""${indent}${key}${separator}${quote}${value}${quote}"""
+  }
+  private def escapePattern(value: String) = value.matches("""^.*[\\'"${}].*$""")
 }
