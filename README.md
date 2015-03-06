@@ -6,8 +6,8 @@ Media transcofing tool with FFmpeg and OpenH264
 Install
 --------
 
-Deploy open-transcode to an arbitrary directory
-The explanation below is Supposed that $OPEN_TRANSCODER_HOME is the directory
+- Deploy open-transcode to an arbitrary directory
+  - The explanation below is supposed that $OPEN_TRANSCODER_HOME is the directory
 
 ### Windows and Linux
 
