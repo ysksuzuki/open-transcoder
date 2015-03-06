@@ -1,28 +1,29 @@
 open-transcoder
 ===============
 
-FFmpegとopenh264を利用したメディアトランスコーダー
+Media transcofing tool with FFmpeg and OpenH264
 
 Install
 --------
 
-open-transcodeを任意のディレクトリに配置する。
+Deploy open-transcode to an arbitrary directory
+The explanation below is Supposed that $OPEN_TRANSCODER_HOME is the directory
 
 ### Windows and Linux
 
-- open-transcode/ に移動して以下のコマンドを実行する。
+- Move to open-transcode/, and run the command below
 
 ~~~
 $ java -jar open-transcoder.jar config
 ~~~
 
-- open-transcoder.confが生成されたことを確認し、続いて以下のコマンドを実行する。
+- Confirm open-transcoder.conf in the current directory, and run the command below
 
 ~~~
 $ java -jar open-transcoder.jar install
 ~~~
 
-- Linuxの場合のみ以下を.bash_profileに追加、sourceコマンドを実行して反映する。
+- In case of Linux, add the line below to .bash_profile, and run source command to enable system to use it.
 
 ~~~
 $ export LD_LIBRARY_PATH=${OPEN_TRANSCODER_HOME}/bin:${LD_LIBRARY_PATH}
@@ -40,23 +41,23 @@ install
 java -jar open-transcoder.jar [options]
 
 [options]
-*  -i  | --input  <file>    (required)
-*  -o  | --output <file>... (required)
-*  -l  | --logLevel <quiet|error|info|warning>
-*  -h  | --help
-*  -li | --license
+-  -i  | --input  <file>    (required)
+-  -o  | --output <file>... (required)
+-  -l  | --logLevel <quiet|error|info|warning>
+-  -h  | --help
+-  -li | --license
 
 [Example]
-*  mp4
-    *  java -jar open-transcoder.jar -i input.mp4 -o output.mp4 -l quiet
-*  hls
-    *  java -jar open-transcoder.jar -i input.mp4 -o playlist.m3u8 -l quiet
-*  webm
-    *  java -jar open-transcoder.jar -i input.mp4 -o output.webm -l quiet
+-  mp4
+    -  java -jar open-transcoder.jar -i input.mp4 -o output.mp4 -l quiet
+-  hls
+    -  java -jar open-transcoder.jar -i input.mp4 -o playlist.m3u8 -l quiet
+-  webm
+    -  java -jar open-transcoder.jar -i input.mp4 -o output.webm -l quiet
 
 [Usage - config]
-*  java -jar open-transcoder.jar config
+-  java -jar open-transcoder.jar config
 
 [Usage - install]
-*  java -jar open-transcoder.jar install
+-  java -jar open-transcoder.jar install
 
