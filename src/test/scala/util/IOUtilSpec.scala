@@ -1,7 +1,6 @@
 package util
 
 import java.io.File
-
 import test.UnitSpec
 import scala.io.Source
 import scala.util.Properties
@@ -31,66 +30,145 @@ class IOUtiSpec extends UnitSpec {
   override def afterAll(): Unit = {
   }
 
-  "The download function" should "download a file which is indicated" in {
-    assert(IOUtil.download(url, resources).get == "openh264-linux64-v1.3.zip")
+  describe("download") {
+    it("should download a file which is indicated") {
+      assert(IOUtil.download(url, resources).get == "openh264-linux64-v1.3.zip")
+    }
   }
 
-  "The writeText function" should "write a text to a file which is indicated" in {
-    val text =
-      """
-        |This is a sample text.
-        |hogehoge
-        |fugafuga
-      """.stripMargin
-    val appendText =
-      """
-        |
-        |This is a append text.
-      """.stripMargin
-    val file = resources + "/writeText.txt"
-    IOUtil.writeText(file, text)
-    var source = Source.fromFile(file)
-    assert(text == source.getLines().mkString(Properties.lineSeparator))
+  describe("writeText") {
+    it("should write texts to a file which is indicated") {
+      val text =
+        """
+          |This is a sample text.
+          |hogehoge
+          |fugafuga
+        """.stripMargin
+      val appendText =
+        """
+          |
+          |This is a append text.
+        """.stripMargin
+      val file = resources + "/writeText.txt"
+      IOUtil.writeText(file, text)
+      var source = Source.fromFile(file)
+      assert(text == source.getLines().mkString(Properties.lineSeparator))
 
-    IOUtil.writeText(file, appendText, true)
-    source = Source.fromFile(file)
-    assert(text + appendText == source.getLines().mkString(Properties.lineSeparator))
-
+      IOUtil.writeText(file, appendText, true)
+      source = Source.fromFile(file)
+      assert(text + appendText == source.getLines().mkString(Properties.lineSeparator))
+    }
   }
 
-  "The extension function" should "extract an extension from a file name" in {
-    assert("zip" == IOUtil.extension(url).get)
-  }
-
-  "The filename function" should "extract a file name from an uri" in {
-    assert("openh264-linux64-v1.3.zip" == IOUtil.filename(url).get)
-  }
-
-  "The fileSearch function" should "searche files from a directory recursively" in {
-    val expected = List(
-      new File("src/test/resources/util/hoge/fuga.txt"),
-      new File("src/test/resources/util/hoge.txt"),
-      new File("src/test/resources/util/hoge/fuga/fuga.txt")
-    )
-    prepareFiles()
-    val result = IOUtil.fileSearch(new File(resources))
-    assert(result == expected)
-  }
-
-  "The fileSearch function" should "searche and filters files from a directory recursively" in {
-    val expected = List(
-      new File("src/test/resources/util/hoge/fuga.txt"),
-      new File("src/test/resources/util/hoge/fuga/fuga.txt")
-    )
-    prepareFiles()
-    val result = IOUtil.fileSearch(new File(resources)) { file =>
-      val pattern = """(fuga).*""".r
-      file.getName match {
-        case pattern(n) => true
-        case _ => false
+  describe("Extension") {
+    it("should extract an extension from a file name") {
+      url match {
+        case Extension(extension) => assert("zip" == extension)
+        case _ => fail()
       }
     }
-    assert(result == expected)
+    describe("when empty") {
+      it("should return None") {
+        val file = ""
+        file match {
+          case Extension(extension) => fail(s"extension = ${extension}")
+          case _ => assert(true)
+        }
+      }
+    }
+    describe("when no full stop") {
+      it("should return None") {
+        val file = "/var/tmp/file"
+        file match {
+          case Extension(extension) => fail(s"extension = ${extension}")
+          case _ => assert(true)
+        }
+      }
+    }
+  }
+
+  describe("Filename") {
+    it("should extract a file name from an uri") {
+      url match {
+        case Filename(name) => assert("openh264-linux64-v1.3.zip" == name)
+        case _ => fail()
+      }
+    }
+    describe("when empty") {
+      it("should return None") {
+        val file = ""
+        file match {
+          case Filename(name) => fail(s"name = ${name}")
+          case _ => assert(true)
+        }
+      }
+    }
+    describe("when no separator") {
+      it("should return a file name") {
+        val file = "file.txt"
+        file match {
+          case Filename(name) => assert(name == file)
+          case _ => fail()
+        }
+      }
+    }
+  }
+
+  describe("Parent") {
+    it("should extract parents from an uri") {
+      val path = "/var/tmp/openh264-linux64-v1.3.zip"
+      path match {
+        case Parent(parent) => assert(List("", "var", "tmp") == parent)
+        case _ => fail()
+      }
+    }
+    describe("when empty") {
+      it("should return None") {
+        val file = ""
+        file match {
+          case Parent(parent) => fail(s"parent = ${parent}")
+          case _ => assert(true)
+        }
+      }
+    }
+    describe("when no parent") {
+      it("should return None") {
+        val file = "file.txt"
+        file match {
+          case Parent(parent) => fail(s"parent = ${parent}")
+          case _ => assert(true)
+        }
+      }
+    }
+  }
+
+  describe("fileSearch") {
+    it("should search files from a directory recursively") {
+      val expected = List(
+        new File("src/test/resources/util/hoge/fuga.txt"),
+        new File("src/test/resources/util/hoge.txt"),
+        new File("src/test/resources/util/hoge/fuga/fuga.txt")
+      )
+      prepareFiles()
+      val result = IOUtil.fileSearch(new File(resources))
+      assert(result == expected)
+    }
+
+    it("should search and filters files from a directory recursively") {
+      val expected = List(
+        new File("src/test/resources/util/hoge/fuga.txt"),
+        new File("src/test/resources/util/hoge/fuga/fuga.txt")
+      )
+      prepareFiles()
+      val result = IOUtil.fileSearch(new File(resources)) { file =>
+        val pattern = """(fuga).*""".r
+        file.getName match {
+          case pattern(n) => true
+          case _ => false
+        }
+      }
+      assert(result == expected)
+    }
   }
 
   def prepareFiles() = {

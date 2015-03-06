@@ -169,7 +169,7 @@ object AppMain {
   }
 
   private def trye[T](f: => T)(implicit onError: Throwable => Either[Throwable,T] = { t:Throwable => Left(t) }): Either[Throwable,T] = {
-    try{
+    try {
       Right(f)
     } catch {
       case c: Throwable => onError(c)

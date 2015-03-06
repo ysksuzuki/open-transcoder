@@ -33,10 +33,12 @@ class InstallManagerSpec extends UnitSpec {
   override def afterAll(): Unit = {
   }
 
-  "The install function" should "install a OpenH264 library" in {
-    val config = ConfigFactory.load()
-    InstallManager(config).install()
-    assert(new File(resources + "/" + libName).exists())
-    assert(new File(resources + "/" + infoName).exists())
+  describe("install") {
+    it("should install a OpenH264 library") {
+      val config = ConfigFactory.load()
+      InstallManager(config).install()
+      assert(new File(resources + "/" + libName).exists())
+      assert(new File(resources + "/" + infoName).exists())
+    }
   }
 }

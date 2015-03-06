@@ -2,7 +2,7 @@ package app
 
 import com.typesafe.config.Config
 import model.{MediaInfo, LogLevel, BasicCommand, CommandLineArgs}
-import util.IOUtil
+import util.{Parent, Extension}
 
 object Transcoder {
 
@@ -19,13 +19,17 @@ object Transcoder {
     Command(BasicCommand, command, logLevel).execute(params)
   }
 
-  private def getTranscodeCommand(config: Config, args: CommandLineArgs, mediaInfo: MediaInfo) = {
-    val extension = IOUtil.extension(args.out1).getOrElse("")
-    extension match {
-      case "mp4"  => getMp4TranscodeCommand(config, args, mediaInfo)
-      case "m3u8" => getHlsTranscodeCommand(config, args, mediaInfo)
-      case "webm" => getWebMTranscodeCommand(config, args, mediaInfo)
-      case _      => getHlsTranscodeCommand(config, args, mediaInfo)
+  private def getTranscodeCommand(config: Config, args: CommandLineArgs, mediaInfo: MediaInfo): (CommandBase, Seq[String]) = {
+    args.out1 match {
+      case Extension(extension) => {
+        extension match {
+          case "mp4" => getMp4TranscodeCommand(config, args, mediaInfo)
+          case "m3u8" => getHlsTranscodeCommand(config, args, mediaInfo)
+          case "webm" => getWebMTranscodeCommand(config, args, mediaInfo)
+          case _@ex => throw new Exception(s"Format ${ex} is not supported")
+        }
+      }
+      case _ => throw new Exception("""Couldn't detect a target format""")
     }
   }
 
@@ -54,7 +58,14 @@ object Transcoder {
         if (mediaInfo.videoInfo.codec_name == "h264") "copy" else "libopenh264",
         if (mediaInfo.audioInfo.codec_name == "aac") "copy" else "libvo_aacenc",
         args.out1,
-        if (!args.out2.isEmpty) args.out2 else config.getString("fileName.segment"),
+        if (!args.out2.isEmpty) args.out2
+        else {
+          val segment = config.getString("fileName.segment")
+          args.out1 match {
+            case Parent(parent) => List(parent, List(segment)).flatten.mkString("/")
+            case _ => segment
+          }
+        },
         args.logLevel.level
       )
     )

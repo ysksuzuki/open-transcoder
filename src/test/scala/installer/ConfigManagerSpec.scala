@@ -30,8 +30,10 @@ class ConfigManagerSpec extends UnitSpec {
   override def afterAll(): Unit = {
   }
 
-  "The configure function" should "create a configuration file" in {
-    ConfigManager().configure(resources + conf)
-    assert(new File(resources + conf).exists())
+  describe("configure") {
+    it("should create a configuration file") {
+      ConfigManager().configure(resources + conf)
+      assert(new File(resources + conf).exists())
+    }
   }
 }

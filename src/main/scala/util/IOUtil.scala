@@ -12,19 +12,6 @@ object IOUtil {
     Using.fileWriter(IO.utf8, append)(new File(file)) { out => out.write(text) }
   }
 
-  def extension(uri: String) = {
-    uri match {
-      case Extension(extension) => Some(extension)
-      case _ => None
-    }
-  }
-  def filename(uri: String) = {
-    uri match {
-      case Filename(filename) => Some(filename)
-      case _ => None
-    }
-
-  }
   def download(url: String, dest: String = "data") = {
     val data = Resource.fromURL(url).byteArray
     url match {
@@ -36,7 +23,7 @@ object IOUtil {
     }
   }
 
-  def fileSearch(file: File)(implicit f: File => Boolean = f => true) = {
+  def fileSearch(file: File)(implicit f: File => Boolean = { file => true }) = {
     @tailrec
     def fileSearchInner(files: List[File], result: List[File]): List[File] = {
       if (files.forall(_.isFile)) {
@@ -49,16 +36,34 @@ object IOUtil {
   }
 }
 
-trait FileExtractor {
-  def extract(uri: String, separator: String) = {
-   uri.split(separator).reverse.toList.headOption
+object Filename {
+  def unapply(uri: String): Option[String] = {
+    if(uri.isEmpty) None
+    else uri.split("/").reverse.toList.headOption
   }
 }
 
-object Filename extends FileExtractor {
- def unapply(url: String) = extract(url, "/")
+object Extension {
+  def unapply(uri: String): Option[String] = {
+    uri match {
+      case Filename(name) => {
+        if (name.contains(".")) {
+          name.split("\\.").reverse.toList.headOption
+        } else None
+      }
+      case _ => None
+    }
+  }
 }
 
-object Extension extends FileExtractor {
-  def unapply(path: String): Option[String] = extract(path, "\\.")
+object Parent {
+  def unapply(uri: String): Option[List[String]] = {
+    uri.split("/").toList match {
+      case parent :+ file => {
+        if (!parent.isEmpty) Some(parent)
+        else None
+      }
+      case _ => None
+    }
+  }
 }
