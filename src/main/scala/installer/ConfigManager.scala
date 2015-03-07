@@ -16,6 +16,12 @@ trait Configure {
       """include classpath("application.conf")
         |
         |""".stripMargin
+    val comment =
+      """# If you want change configurations, remove comment out and update a value.
+        |# Please leave them commented out when you don't need change.
+        |# Default value will be applied.
+        |
+      """ .stripMargin
     val contents = Source.fromURL(getClass.getClassLoader.getResource("application.conf"))
       .getLines().map {
       case line@Property(key) => {
@@ -30,12 +36,12 @@ trait Configure {
             }
             StringProperty("dest", dest)
           }
-          case _ => "//" + line
+          case _ => "#" + line
         }
       }
       case line => line
     } mkString Properties.lineSeparator
-    IOUtil.writeText(file, header + contents)
+    IOUtil.writeText(file, header + comment + contents)
   }
   protected def getAbsolutePath(pattern: String): String = {
     val current = new File(".").getAbsoluteFile.getParent
