@@ -2,9 +2,13 @@
 
 Media transcofing tool with FFmpeg and OpenH264
 
+## Build
+
+Move to the progect home and run ant command. After finishing the build, check target/open-transcoder. Ant and sbt are required to build the project.
+
 ## Getting Started
 
-Deploy open-transcode to an arbitrary directory. The explanation below is supposed that $OPEN_TRANSCODER_HOME is this directory.
+Deploy open-transcoder to an arbitrary directory. The explanation below is supposed that $OPEN_TRANSCODER_HOME is this directory.
 
 ### Windows and Linux
 
