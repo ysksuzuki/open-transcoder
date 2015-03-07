@@ -1,6 +1,6 @@
 # open-transcoder
 
-Media transcofing tool with FFmpeg and OpenH264
+Media transcoding tool with FFmpeg and OpenH264
 
 ## Build
 
