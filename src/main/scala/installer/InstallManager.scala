@@ -23,14 +23,14 @@ trait Installer {
 class WindowsInstaller(
         override val url: String, override val dest: String, override val libName: String) extends Installer {
   override def configure() = {
-    new File(dest + "/" + libName).renameTo(new File(dest + "/libopenh264.dll"))
+    new File(dest, libName).renameTo(new File(dest, "libopenh264.dll"))
   }
 }
 
 class LinuxInstaller(
         override val url: String, override val dest: String, override val libName: String) extends Installer {
   override def configure() = {
-    new File(dest + "/" + libName).renameTo(new File(dest + "/libopenh264.so.0"))
+    new File(dest, libName).renameTo(new File(dest, "libopenh264.so.0"))
     Command(BasicCommand, s"chmod 775 ${dest}/ffmpeg", Quiet).execute()
     Command(BasicCommand, s"chmod 775 ${dest}/ffprobe", Quiet).execute()
     Command(BasicCommand, s"chmod 775 ${dest}/run.sh", Quiet).execute()
@@ -40,10 +40,7 @@ class LinuxInstaller(
 object InstallManager {
 
   def apply(config: Config) = {
-    if (PlatformUtil.isLinux) {
-      new LinuxInstaller(
-        config.getString("openh264.linux.url"), config.getString("openh264.dest"), config.getString("openh264.linux.libName"))
-    } else if (PlatformUtil.isWindows) {
+    if (PlatformUtil.isWindows) {
       new WindowsInstaller(
         config.getString("openh264.windows.url"), config.getString("openh264.dest"), config.getString("openh264.windows.libName"))
     } else {

@@ -34,12 +34,20 @@ object IOUtil {
     }
     fileSearchInner(List(file), Nil)
   }
+
+  def detectSeparator(uri: String) = {
+    if (PlatformUtil.isLinux) "/"
+    else {
+      if (uri.contains("/")) "/"
+      else "\\"
+    }
+  }
 }
 
 object Filename {
   def unapply(uri: String): Option[String] = {
-    if(uri.isEmpty) None
-    else uri.split("/").reverse.toList.headOption
+    if (uri.isEmpty) None
+    else uri.split(IOUtil.detectSeparator(uri)).reverse.toList.headOption
   }
 }
 
@@ -58,7 +66,7 @@ object Extension {
 
 object Parent {
   def unapply(uri: String): Option[List[String]] = {
-    uri.split("/").toList match {
+    uri.split(IOUtil.detectSeparator(uri)).toList match {
       case parent :+ file => {
         if (!parent.isEmpty) Some(parent)
         else None

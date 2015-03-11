@@ -24,6 +24,12 @@ class BasicCommand(val command: String, val logLevel: LogLevel) extends CommandB
   }
 }
 
+class WithEnvCommand(val command: String, val logLevel: LogLevel, val extraEnv: (String, String)*) extends CommandBase {
+  override protected def executeCommand(params: Seq[String], file: Option[File]): String = {
+    Process(command.format(params: _*), None, extraEnv: _*).!!
+  }
+}
+
 class RedirectCommand(val command: String, val logLevel: LogLevel) extends CommandBase {
   protected def executeCommand(params: Seq[String], file: Option[File]): String = {
     file map { file =>
@@ -38,5 +44,8 @@ object Command {
       case BasicCommand => new BasicCommand(command, logLevel)
       case RedirectCommand => new RedirectCommand(command, logLevel)
     }
+  }
+  def apply(command: String, logLevel: LogLevel, extraEnv: (String, String) *) = {
+     new WithEnvCommand(command, logLevel, extraEnv: _*)
   }
 }

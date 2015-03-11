@@ -57,8 +57,7 @@ class LinuxConfigure extends Configure {
 
 object ConfigManager {
   def apply() = {
-    if (PlatformUtil.isLinux) new LinuxConfigure()
-    else if (PlatformUtil.isWindows) new WindowsConfigure()
+    if (PlatformUtil.isWindows) new WindowsConfigure()
     else new LinuxConfigure()
   }
 }

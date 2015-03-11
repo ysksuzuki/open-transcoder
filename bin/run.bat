@@ -16,7 +16,7 @@ set JAVA_OPTS=%SECURITY_OPTS% %JAVA_OPTS% %JVM_OPTS%
 set PRG_DIR=%~dp0
 
 echo Starting open-transcoder
-"%JAVA_HOME%\bin\java" %JAVA_OPTS% -jar %PRG_DIR%..\open-transcoder.jar
+"%JAVA_HOME%\bin\java" %JAVA_OPTS% -jar %PRG_DIR%..\open-transcoder.jar %*
 goto finally
 
 :err

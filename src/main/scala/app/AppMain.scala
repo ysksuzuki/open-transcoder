@@ -88,13 +88,6 @@ object AppMain {
            |License:
            |http://www.openh264.org/BINARY_LICENSE.txt"
            |
-           |Please add your shared library path.
-           |Linux:
-           |Add this to your .bash_profile and run source command
-           | export LD_LIBRARY_PATH=${config.getString("openh264.dest")}:${dollar}LD_LIBRARY_PATH
-           |Windows:
-           | Nothing to do
-           |
          """.stripMargin)
       Success
     } catch {
