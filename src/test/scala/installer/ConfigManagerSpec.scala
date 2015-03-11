@@ -1,9 +1,7 @@
 package installer
 
 import java.io.File
-
 import test.UnitSpec
-
 import scalax.file.Path
 import scalax.file.PathMatcher.All
 
